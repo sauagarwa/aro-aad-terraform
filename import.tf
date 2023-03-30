@@ -24,11 +24,21 @@ resource "azapi_resource" "aro_cluster" {
   }
 }
 
+resource "azapi_resource_action" "listAdminCredentials" {
+  type                   = "Microsoft.RedHatOpenShift/OpenShiftClusters@2021-09-01-preview"
+  resource_id            =  azapi_resource.aro_cluster.id
+  action                 = "listAdminCredentials"
+  response_export_values = ["*"]
+}
+
 resource "azapi_resource_action" "listCredentials" {
   type                   = "Microsoft.RedHatOpenShift/OpenShiftClusters@2022-04-01"
   resource_id            =  azapi_resource.aro_cluster.id
   action                 = "listCredentials"
   response_export_values = ["*"]
+  depends_on = [
+        local_file.kubeconfig
+    ]
 }
 
 locals {
@@ -39,11 +49,21 @@ locals {
     apiserver_url =  local.aro_properties.properties.apiserverProfile.url
     domain = local.aro_properties.properties.clusterProfile.domain
     oauth_callback_url="https://oauth-openshift.apps.${local.domain}.${local.location}.aroapp.io/oauth2callback/AAD"
-    tenant_id = azapi_resource.aro_cluster.identity
     aro_credentials = jsondecode(azapi_resource_action.listCredentials.output)
     kube_admin_username = local.aro_credentials.kubeadminUsername
     kube_admin_password = local.aro_credentials.kubeadminPassword
+    admin_credentials = jsondecode(azapi_resource_action.listAdminCredentials.output)
+    kube_config = base64decode(local.admin_credentials.kubeconfig)
 }
+
+resource "local_file" "kubeconfig" {
+    filename = "${path.module}/kubeconfig"
+    content = local.kube_config
+    depends_on = [
+        azapi_resource_action.listAdminCredentials
+    ]
+}
+
 
 resource "azuread_application" "cluster" {
     display_name            = "${local.name_prefix}-cluster-app"
@@ -122,6 +142,18 @@ output "kube_admin_username" {
 
 output "kube_admin_password" {
     value = local.kube_admin_password
+}
+
+output "admin_credentials" {
+    value =  azapi_resource_action.listAdminCredentials
+}
+
+output "kube_config" {
+    value =  local.kube_config
+}
+
+output "kube_config_path" {
+    value = path.module
 }
 
 

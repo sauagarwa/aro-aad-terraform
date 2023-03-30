@@ -12,12 +12,21 @@ terraform {
       source  = "Azure/azapi"
       version = ">=1.0.0"
     }
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+    }
+    local = {
+      source = "hashicorp/local"
+    }
 
   }
 }
 
-
 provider "azapi" {
+}
+
+provider "local" {
+
 }
 
 provider "azurerm" {

@@ -32,6 +32,7 @@ variable "resource_group_name" {
   description = "Resource group name"
 }
 
+
 # variable "tags" {
 #   type = map(string)
 #   default = {
