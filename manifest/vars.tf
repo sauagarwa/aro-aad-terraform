@@ -21,10 +21,10 @@ variable "metadata_name" {
     default     = null
 }
 
-variable "spec_group" {
-    type        = string
+variable "spec" {
+    type        = any
     description = "A map of key-value pairs of Settings."
-    default     = null
+    default     = {}
 }
 variable "spec_scope" {
     type        = string

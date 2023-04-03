@@ -22,23 +22,24 @@ resource "kubernetes_manifest" "manifest" {
             name = var.metadata_name
         }
 
-        spec = {
-            group = var.spec_group #"hashicorp.com"
-            scope = var.spec_scope #"Namespaced"
+        spec = var.spec
+        # {
+        #     group = var.spec_group #"hashicorp.com"
+        #     scope = var.spec_scope #"Namespaced"
 
-            names = {
-                kind   = var.spec_kind #"TestCrd"
-                plural = var.spec_plural #"testcrds"
-            }
+        #     names = {
+        #         kind   = var.spec_kind #"TestCrd"
+        #         plural = var.spec_plural #"testcrds"
+        #     }
 
-            versions = [{
-                name    = "v1"
-                served  = true
-                storage = true
-                # schema = {
-                # }
-            }]
-        }
+        #     versions = [{
+        #         name    = "v1"
+        #         served  = true
+        #         storage = true
+        #         # schema = {
+        #         # }
+        #     }]
+        # }
     }
 }
 
